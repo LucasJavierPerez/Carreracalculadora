@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiempos por distancias parciales</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 95%;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .input-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .input-section label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #333;
+        }
+        
+        .input-section input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        
+        .input-section button {
+            padding: 8px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .input-section button:hover {
+            background-color: #0056b3;
+        }
+        
+        .training-table {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 20px;
+            border: 2px solid #333;
+            border-radius: 8px;
+        }
+        
+        .training-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        .training-table th {
+            background-color: #333;
+            color: white;
+            padding: 10px 6px;
+            text-align: center;
+            border: 1px solid #555;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .training-table td {
+            padding: 6px 4px;
+            text-align: center;
+            border: 1px solid #ddd;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+        
+        /* Colores exactos de la imagen */
+        .zone-regenerative {
+            background-color: #f0f8e0; /* Verde muy pálido - Regenerativo */
+        }
+        
+        .zone-sub-aerobic {
+            background-color: #e0f0ff; /* Azul claro - Sub Aeróbico */
+        }
+        
+        .zone-threshold {
+            background-color: #e0ffe0; /* Verde claro - Umbral anaeróbico */
+        }
+        
+        .zone-vo2 {
+            background-color: #ffe0e0; /* Rojo claro - VO2 */
+        }
+        
+        /* Estilo para la fila resaltada */
+        .training-table .highlighted-row {
+            background-color: #ffffc7 !important;
+            font-weight: bold;
+            border: 2px solid #ffa500;
+        }
+        
+        .training-table .highlighted-row td {
+            border: 2px solid #ffa500;
+        }
+        
+        /* Estilos para la primera columna (Zona de Intensidad) */
+        .training-table td:first-child {
+            font-weight: bold;
+            text-align: left;
+            background-color: #f8f9fa;
+            border-right: 2px solid #333;
+        }
+        
+        /* Estilos para encabezados de distancia */
+        .training-table th:nth-child(n+4) {
+            background-color: #555;
+            font-size: 11px;
+        }
+        
+        /* Información del VO2 */
+        .vo2-info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e7f3fe;
+            border-left: 6px solid #2196F3;
+            border-radius: 4px;
+        }
+        
+        .vo2-info h3 {
+            margin-top: 0;
+            color: #2196F3;
+        }
+        
+        /* Alertas */
+        .alert {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border: 1px solid transparent;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        /* Navegación */
+        nav {
+            background: #333;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 0 1rem;
+            margin: 0 5px;
+        }
+        
+        nav a:hover {
+            background-color: #555;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 768px) {
+            .training-table {
+                overflow-x: scroll;
+            }
+            .training-table th, .training-table td {
+                font-size: 10px;
+                padding: 4px 2px;
+            }
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('calculator') }}">Calculator</a>
+            <a href="{{ url_for('training_table') }}">Training Table</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </nav>
+
+    <div class="container">
+        <h1>Tiempos por distancias parciales</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="input-section">
+            <form method="POST">
+                <label for="time">Ingresa tu tiempo en 1000m (MM:SS):</label>
+                <input type="text" id="time" name="time" required pattern="^\d{1,2}:\d{2}$" value="{{ time_input }}" placeholder="Ej: 4:30">
+                <button type="submit">Calcular</button>
+            </form>
+        </div>
+
+        {% if vo2_max %}
+            <div class="vo2-info">
+                <h3>Información de tu Rendimiento</h3>
+                <p><strong>VO2 Max Estimado:</strong> {{ vo2_max }} ml/kg/min</p>
+                <p><strong>Tiempo de 1000m:</strong> {{ time_input }}</p>
+                {% if velocity_ms and velocity_kmh %}
+                <p><strong>Velocidad:</strong> {{ velocity_ms|round(2) }} m/s ({{ velocity_kmh|round(2) }} km/h)</p>
+                {% endif %}
+                <p><strong>Nota:</strong> La fila resaltada en amarillo corresponde a la velocidad más cercana a tu ritmo actual.</p>
+            </div>
+        {% endif %}
+
+        {% if table_data and distance_headers %}
+            <div class="training-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Zona de Intensidad</th>
+                            <th>% Vo2 max</th>
+                            <th>Velocidad (m/s)</th>
+                            {% for header in distance_headers %}
+                                {% if header %}
+                                    <th>{{ header }}m</th>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in table_data %}
+                            {% set zone_class = '' %}
+                            {% if 'Regenerativo' in row.zone %}
+                                {% set zone_class = 'zone-regenerative' %}
+                            {% elif 'Sub Aerobico' in row.zone %}
+                                {% set zone_class = 'zone-sub-aerobic' %}
+                            {% elif 'Umbral anaerobico' in row.zone %}
+                                {% set zone_class = 'zone-threshold' %}
+                            {% elif 'Vo2' in row.zone %}
+                                {% set zone_class = 'zone-vo2' %}
+                            {% endif %}
+                            
+                            <tr class="{{ zone_class }} {% if loop.index0 == highlighted_row %}highlighted-row{% endif %}">
+                                <td>{{ row.zone }}</td>
+                                <td>{{ row.vo2_percent }}</td>
+                                <td>{{ row.velocity }}</td>
+                                {% for j in range(distance_headers|length) %}
+                                    {% if distance_headers[j] and j < row.times|length %}
+                                        <td>{{ row.times[j] }}</td>
+                                    {% elif distance_headers[j] %}
+                                        <td></td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% elif request.method == 'POST' %}
+            <div class="alert alert-warning">
+                <p>No se encontraron datos de entrenamiento para tu tiempo. Por favor intenta con un tiempo diferente.</p>
+            </div>
+        {% else %}
+            <div class="info-message">
+                <p>Ingresa tu tiempo de 1000m arriba para ver tus ritmos de entrenamiento personalizados.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
