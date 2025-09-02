@@ -1,83 +1,169 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Running Pace Calculator</title>
+    <title>Calculadora de Ritmos de Running</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <meta name="theme-color" content="#ff0000">
-
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/static/service-worker.js');
-}
-</script>
-
+    <meta name="theme-color" content="#1a2a6c">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'running-primary': '#1a2a6c',
+                        'running-secondary': '#b21f1f',
+                        'running-accent': '#2c3e50',
+                        'running-light': '#f0f8ff'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <nav>
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('calculator') }}">Calculadora</a>
-            <a href="{{ url_for('training_table') }}">Tabla de Entrenamiento</a>
-            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
-        {% else %}
-            <a href="{{ url_for('login') }}">Login</a>
-            <a href="{{ url_for('register') }}">Register</a>
-        {% endif %}
-    </nav>
+<body class="bg-running-light bg-cover bg-fixed bg-center min-h-screen">
+    {% include 'navigation.html' %}
 
-    <div class="container">
-        <h1>Running Pace Calculator</h1>
+    <div class="container mx-auto px-4 py-6 bg-white bg-opacity-90 rounded-xl shadow-xl backdrop-blur-sm">
+        <h1 class="text-3xl md:text-4xl font-bold text-running-primary mb-6">Calculadora de Ritmos de Running</h1>
+
+        <!-- PWA Installation Button -->
+        <div id="install-container" class="text-center my-4 hidden">
+            <button id="install-button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105">
+                📲 Instalar App
+            </button>
+        </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }} mb-6 rounded-lg text-center">
+                        {{ message }}
+                    </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
         {% if current_user.is_authenticated %}
-            <form method="POST">
-                <label for="time">Enter 1000m Time (MM:SS):</label>
-                <input type="text" id="time" name="time" required pattern="^\d{1,2}:\d{2}$">
-                <button type="submit">Calculate</button>
+            <form method="POST" class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+                <div class="mb-6">
+                    <label for="time" class="block text-gray-700 text-lg font-medium mb-2">
+                        Ingresa tu tiempo en 1000m (MM:SS):
+                    </label>
+                    <input type="text" 
+                           id="time" 
+                           name="time" 
+                           required 
+                           pattern="^\d{1,2}:\d{2}$"
+                           placeholder="Ej: 4:30"
+                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-running-primary focus:ring-2 focus:ring-running-primary focus:ring-opacity-50 transition duration-300">
+                </div>
+                <button type="submit" class="w-full bg-running-primary hover:bg-running-secondary text-white font-bold py-3 px-4 rounded-lg transition duration-300 transform hover:scale-105">
+                    Calcular Ritmos
+                </button>
             </form>
 
             {% if base_pace %}
-                <h2>Base Pace: {{ base_pace }} min/km</h2>
+                <div class="mt-8 text-center">
+                    <h2 class="text-2xl font-bold text-running-primary">Ritmo Base: {{ base_pace }} min/km</h2>
+                </div>
             {% endif %}
 
             {% if results %}
-                <h2>Training Zones</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Zone</th>
-                            <th>Min Pace (min/km)</th>
-                            <th>Max Pace (min/km)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for zone, paces in results.items() %}
-                            <tr>
-                                <td>{{ zone }}</td>
-                                <td>{{ paces.min_pace }}</td>
-                                <td>{{ paces.max_pace }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                
-                <div class="action-links">
-                    <a href="{{ url_for('training_table') }}?time={{ original_time }}" class="btn-link">Ver Tabla de Entrenamiento Detallada</a>
+                <div class="mt-10">
+                    <h2 class="text-2xl font-bold text-running-primary mb-6">Zonas de Entrenamiento</h2>
+                    <div class="overflow-x-auto rounded-lg shadow">
+                        <table class="min-w-full bg-white">
+                            <thead>
+                                <tr class="bg-gradient-to-r from-running-primary to-running-accent text-white">
+                                    <th class="py-3 px-4 text-left font-semibold">Zona</th>
+                                    <th class="py-3 px-4 text-center font-semibold">Ritmo Mínimo (min/km)</th>
+                                    <th class="py-3 px-4 text-center font-semibold">Ritmo Máximo (min/km)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                {% for zone, paces in results.items() %}
+                                    <tr class="hover:bg-blue-50 transition duration-150">
+                                        <td class="py-3 px-4 font-medium text-gray-800">{{ zone }}</td>
+                                        <td class="py-3 px-4 text-center">{{ paces.min_pace }}</td>
+                                        <td class="py-3 px-4 text-center">{{ paces.max_pace }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="action-links mt-8">
+                        <a href="{{ url_for('training_table') }}?time={{ original_time }}" 
+                           class="btn-link inline-block bg-running-primary hover:bg-running-secondary text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                            Ver Tabla de Entrenamiento Detallada
+                        </a>
+                    </div>
                 </div>
             {% endif %}
         {% else %}
-            <p>Please <a href="{{ url_for('login') }}">log in</a> to use the calculator.</p>
+            <div class="text-center py-10">
+                <p class="text-xl text-gray-700 mb-6">Por favor <a href="{{ url_for('login') }}" class="text-running-primary font-semibold hover:underline">inicia sesión</a> para usar la calculadora.</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="{{ url_for('login') }}" class="bg-running-primary hover:bg-running-secondary text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                        Iniciar Sesión
+                    </a>
+                    <a href="{{ url_for('register') }}" class="bg-running-secondary hover:bg-running-primary text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+                        Registrarse
+                    </a>
+                </div>
+            </div>
         {% endif %}
     </div>
+
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/service-worker.js')
+                .then(reg => console.log('Service Worker registrado'))
+                .catch(err => console.log('Error al registrar el Service Worker:', err));
+        }
+
+        // PWA Installation
+        let deferredPrompt;
+        const installButton = document.getElementById('install-button');
+        const installContainer = document.getElementById('install-container');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Update UI to notify the user they can install the PWA
+            installContainer.classList.remove('hidden');
+        });
+
+        installButton.addEventListener('click', () => {
+            if (deferredPrompt) {
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Usuario aceptó la instalación');
+                    } else {
+                        console.log('Usuario rechazó la instalación');
+                    }
+                    deferredPrompt = null;
+                    installContainer.classList.add('hidden');
+                });
+            }
+        });
+
+        // Hide the install button when the app is installed
+        window.addEventListener('appinstalled', () => {
+            installContainer.classList.add('hidden');
+            deferredPrompt = null;
+        });
+    </script>
 </body>
 </html>

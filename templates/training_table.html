@@ -3,99 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tiempos por distancias parciales</title>
+    <title>Tabla de Entrenamiento - Tiempos por distancias parciales</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#1a2a6c">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'running-primary': '#1a2a6c',
+                        'running-secondary': '#b21f1f',
+                        'running-accent': '#2c3e50',
+                        'running-light': '#f0f8ff'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
-        }
-        
-        .container {
-            max-width: 95%;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 24px;
-        }
-        
+        /* Additional styles specific to this page */
         .input-section {
             text-align: center;
             margin-bottom: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .input-section label {
-            font-weight: bold;
-            margin-right: 10px;
-            color: #333;
-        }
-        
-        .input-section input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-right: 10px;
-            font-size: 16px;
-        }
-        
-        .input-section button {
-            padding: 8px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        
-        .input-section button:hover {
-            background-color: #0056b3;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .training-table {
             width: 100%;
             overflow-x: auto;
             margin-top: 20px;
-            border: 2px solid #333;
-            border-radius: 8px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         }
         
         .training-table table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 0.9rem;
         }
         
         .training-table th {
-            background-color: #333;
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
             color: white;
-            padding: 10px 6px;
+            padding: 12px 8px;
             text-align: center;
-            border: 1px solid #555;
-            font-weight: bold;
+            font-weight: 600;
             position: sticky;
             top: 0;
             z-index: 10;
         }
         
         .training-table td {
-            padding: 6px 4px;
+            padding: 8px 6px;
             text-align: center;
             border: 1px solid #ddd;
             white-space: nowrap;
-            vertical-align: middle;
         }
         
         /* Colores exactos de la imagen */
@@ -136,65 +104,50 @@
         
         /* Estilos para encabezados de distancia */
         .training-table th:nth-child(n+4) {
-            background-color: #555;
-            font-size: 11px;
+            background: linear-gradient(135deg, #2c3e50, #1a2a6c);
+            font-size: 0.85rem;
         }
         
         /* Información del VO2 */
         .vo2-info {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #e7f3fe;
-            border-left: 6px solid #2196F3;
-            border-radius: 4px;
+            margin: 25px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #e7f3fe, #d1e7ff);
+            border-left: 6px solid #1a2a6c;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         
         .vo2-info h3 {
             margin-top: 0;
-            color: #2196F3;
+            color: #1a2a6c;
+            font-size: 1.4rem;
         }
         
         /* Alertas */
         .alert {
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 4px;
-            border: 1px solid transparent;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-weight: 500;
         }
         
         .alert-danger {
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
+            background: linear-gradient(135deg, #f8d7da, #f1b0b7);
             color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
         
         .alert-success {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
+            background: linear-gradient(135deg, #d4edda, #b1dfbb);
             color: #155724;
-        }
-        
-        /* Navegación */
-        nav {
-            background: #333;
-            color: #fff;
-            padding: 1rem 0;
-            text-align: center;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-        
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            padding: 0 1rem;
-            margin: 0 5px;
-        }
-        
-        nav a:hover {
-            background-color: #555;
-            padding: 8px 12px;
-            border-radius: 4px;
+            border: 1px solid #c3e6cb;
         }
         
         /* Responsive */
@@ -203,64 +156,76 @@
                 overflow-x: scroll;
             }
             .training-table th, .training-table td {
-                font-size: 10px;
+                font-size: 0.75rem;
                 padding: 4px 2px;
-            }
-            .container {
-                padding: 10px;
             }
         }
     </style>
 </head>
-<body>
-    <nav>
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('calculator') }}">Calculator</a>
-            <a href="{{ url_for('training_table') }}">Training Table</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-        {% else %}
-            <a href="{{ url_for('login') }}">Login</a>
-            <a href="{{ url_for('register') }}">Register</a>
-        {% endif %}
-    </nav>
+<body class="bg-running-light bg-cover bg-fixed bg-center min-h-screen">
+    {% include 'navigation.html' %}
+    
+    <!-- PWA Installation Button -->
+    <div id="install-container" class="text-center my-4 hidden">
+        <button id="install-button" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105">
+            📲 Instalar App
+        </button>
+    </div>
 
-    <div class="container">
-        <h1>Tiempos por distancias parciales</h1>
+    <div class="container mx-auto px-4 py-6 bg-white bg-opacity-90 rounded-xl shadow-xl backdrop-blur-sm">
+        <h1 class="text-3xl md:text-4xl font-bold text-running-primary mb-6">Tabla de Entrenamiento - Tiempos por distancias parciales</h1>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }} mb-6 rounded-lg text-center">
+                        {{ message }}
+                    </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
         <div class="input-section">
             <form method="POST">
-                <label for="time">Ingresa tu tiempo en 1000m (MM:SS):</label>
-                <input type="text" id="time" name="time" required pattern="^\d{1,2}:\d{2}$" value="{{ time_input }}" placeholder="Ej: 4:30">
-                <button type="submit">Calcular</button>
+                <div class="mb-4">
+                    <label for="time" class="block text-gray-800 text-lg font-medium mb-2">
+                        Ingresa tu tiempo en 1000m (MM:SS):
+                    </label>
+                    <input type="text" 
+                           id="time" 
+                           name="time" 
+                           required 
+                           pattern="^\d{1,2}:\d{2}$" 
+                           value="{{ time_input }}" 
+                           placeholder="Ej: 4:30"
+                           class="px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-running-primary focus:ring-2 focus:ring-running-primary focus:ring-opacity-50 transition duration-300 text-center">
+                </div>
+                <button type="submit" class="w-full md:w-auto bg-running-primary hover:bg-running-secondary text-white font-bold py-3 px-6 rounded-lg transition duration-300 transform hover:scale-105">
+                    Calcular Tiempos
+                </button>
             </form>
         </div>
 
         {% if vo2_max %}
             <div class="vo2-info">
-                <h3>Información de tu Rendimiento</h3>
-                <p><strong>VO2 Max Estimado:</strong> {{ vo2_max }} ml/kg/min</p>
-                <p><strong>Tiempo de 1000m:</strong> {{ time_input }}</p>
-                {% if velocity_ms and velocity_kmh %}
-                <p><strong>Velocidad:</strong> {{ velocity_ms|round(2) }} m/s ({{ velocity_kmh|round(2) }} km/h)</p>
-                {% endif %}
-                <p><strong>Nota:</strong> La fila resaltada en amarillo corresponde a la velocidad más cercana a tu ritmo actual.</p>
+                <h3 class="text-xl font-bold">Información de tu Rendimiento</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <p class="font-semibold"><strong>VO2 Max Estimado:</strong> <span class="text-lg">{{ vo2_max }} ml/kg/min</span></p>
+                    <p class="font-semibold"><strong>Tiempo de 1000m:</strong> <span class="text-lg">{{ time_input }}</span></p>
+                    {% if velocity_ms and velocity_kmh %}
+                    <p class="font-semibold"><strong>Velocidad:</strong> <span class="text-lg">{{ velocity_ms|round(2) }} m/s ({{ velocity_kmh|round(2) }} km/h)</span></p>
+                    {% endif %}
+                </div>
+                <p class="mt-4 italic"><strong>Nota:</strong> La fila resaltada en amarillo corresponde a la velocidad al 100 % de tu ritmo.</p>
             </div>
         {% endif %}
 
         {% if table_data and distance_headers %}
             <div class="training-table">
-                <table>
+                <table class="min-w-full bg-white">
                     <thead>
                         <tr>
-                            <th>Zona de Intensidad</th>
+                            <th class="text-left">Zona de Intensidad</th>
                             <th>% Vo2 max</th>
                             <th>Velocidad (m/s)</th>
                             {% for header in distance_headers %}
@@ -284,7 +249,7 @@
                             {% endif %}
                             
                             <tr class="{{ zone_class }} {% if loop.index0 == highlighted_row %}highlighted-row{% endif %}">
-                                <td>{{ row.zone }}</td>
+                                <td class="font-bold">{{ row.zone }}</td>
                                 <td>{{ row.vo2_percent }}</td>
                                 <td>{{ row.velocity }}</td>
                                 {% for j in range(distance_headers|length) %}
@@ -300,14 +265,60 @@
                 </table>
             </div>
         {% elif request.method == 'POST' %}
-            <div class="alert alert-warning">
+            <div class="alert alert-warning text-center">
                 <p>No se encontraron datos de entrenamiento para tu tiempo. Por favor intenta con un tiempo diferente.</p>
             </div>
         {% else %}
-            <div class="info-message">
-                <p>Ingresa tu tiempo de 1000m arriba para ver tus ritmos de entrenamiento personalizados.</p>
+            <div class="info-message text-center py-8">
+                <p class="text-lg text-gray-700">Ingresa tu tiempo de 1000m arriba para ver tus ritmos de entrenamiento personalizados.</p>
             </div>
         {% endif %}
     </div>
+
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/service-worker.js')
+                .then(reg => console.log('Service Worker registrado'))
+                .catch(err => console.log('Error al registrar el Service Worker:', err));
+        }
+
+        // PWA Installation
+        let deferredPrompt;
+        const installButton = document.getElementById('install-button');
+        const installContainer = document.getElementById('install-container');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Update UI to notify the user they can install the PWA
+            installContainer.classList.remove('hidden');
+        });
+
+        installButton.addEventListener('click', () => {
+            if (deferredPrompt) {
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Usuario aceptó la instalación');
+                    } else {
+                        console.log('Usuario rechazó la instalación');
+                    }
+                    deferredPrompt = null;
+                    installContainer.classList.add('hidden');
+                });
+            }
+        });
+
+        // Hide the install button when the app is installed
+        window.addEventListener('appinstalled', () => {
+            installContainer.classList.add('hidden');
+            deferredPrompt = null;
+        });
+    </script>
 </body>
 </html>

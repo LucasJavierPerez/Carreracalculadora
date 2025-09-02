@@ -206,15 +206,15 @@ def calculator():
         base_speed_kmh = 3600 / base_pace_min_km
 
         zones = {
-            'Z1 (Recovery)': (0.65, 0.75),
-            'Z2 (Aerobic)': (0.75, 0.85),
-            'Z3 (Aerobic Threshold)': (0.85, 0.90),
-            'Z4 (Anaerobic Threshold)': (0.90, 0.95),
-            'Z5 (Maximum Effort)': (0.95, 1.00)
+            'Zona 1 (Regenerativo) % 50 al 60': (0.50, 0.60),
+            'Zona 2 (Umbral Aeróbico) % 65 al 70': (0.65, 0.70),
+            'Zona 3 (Umbral Anaeróbico) % 75 al 85': (0.75, 0.85),
+            'Zona 4 (Vo2 Max) % 90 al 100': (0.90, 1.00),
+            'Zona 5 (Tolerancia Láctica) % 105 al 115': (1.05, 1.15)
         }
 
         results = {}
-        for zone, (min_perc, max_perc) in zones.items():
+        for zone, (max_perc, min_perc) in zones.items():
             min_speed = base_speed_kmh * min_perc
             max_speed = base_speed_kmh * max_perc
             min_pace = 60 / max_speed
@@ -233,4 +233,6 @@ def calculator():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    # Use Railway's PORT environment variable or default to 5001 for local testing
+    port = int(os.environ.get('PORT', 5001))
+    app.run(debug=True, host='0.0.0.0', port=port)

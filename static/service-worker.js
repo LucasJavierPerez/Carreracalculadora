@@ -1,12 +1,15 @@
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open("app-cache").then(cache => {
+    caches.open("app-cache-v2").then(cache => {
       return cache.addAll([
         "/",
+        "/calculator",
+        "/training_table",
         "/static/style.css",
-        "/static/icons/icon-192.png",
-        "/static/icons/icon-512.png"
-      ]);
+        "/static/manifest.json"
+      ]).catch(error => {
+        console.error('Failed to cache resources:', error);
+      });
     })
   );
 });
