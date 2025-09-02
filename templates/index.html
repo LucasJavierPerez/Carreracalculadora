@@ -7,7 +7,12 @@
     <title>Calculadora de Ritmos de Running</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <!-- iOS meta tags -->
     <meta name="theme-color" content="#1a2a6c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Running Calculator">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
