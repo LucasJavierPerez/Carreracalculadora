@@ -51,9 +51,10 @@ def training_table():
     # Definir las zonas de entrenamiento y sus porcentajes de VO2 max
     training_zones = [
         {'name': 'Regenerativo', 'percentages': [40, 45, 50]},
-        {'name': 'Sub Aerobico', 'percentages': [55, 60, 65, 70]},
-        {'name': 'Umbral anaerobico', 'percentages': [75, 80, 85]},
-        {'name': 'Vo2', 'percentages': [90, 95, 100, 105, 110, 115]}
+        {'name': 'Umbral Aeróbico', 'percentages': [55, 60, 65, 70]},
+        {'name': 'Umbral anaeróbico', 'percentages': [75, 80, 85]},
+        {'name': 'Vo2 Max', 'percentages': [90, 95, 100]},
+        {'name': 'Tolerancia Lactica', 'percentages': [105, 110, 115]}
     ]
     
     # Obtener tiempo del formulario POST o de la URL GET
